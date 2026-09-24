@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Senhas Seguras</title>
+
+  <!-- Importando uma fonte mais amigável e arredondada (Nunito) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /* Cor sólida, sem degradê */
+      background-color: #fff1f2;
+      color: #831843;
+      padding: 20px;
+    }
+
+    .titulo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #9d174d;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .painel {
+      width: 100%;
+      max-width: 420px;
+      background-color: #ffffff;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .campo-senha {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background-color: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      padding: 16px 20px;
+      transition: all 0.3s ease;
+    }
+
+    .campo-senha:hover {
+      border-color: #f97316;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+    }
+
+    #senhaGerada {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #7c2d12;
+      letter-spacing: 1.5px;
+      word-break: break-all;
+    }
+
+    .senha-vazia {
+      color: #a3a3a3 !important;
+      letter-spacing: 0 !important;
+    }
+
+    #botaoCopiar {
+      background: #ffffff;
+      border: 1px solid #fbcfe8;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #db2777;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    #botaoCopiar:hover {
+      background-color: #fdf2f8;
+      transform: scale(1.05);
+    }
+
+    #botaoCopiar:active {
+      transform: scale(0.95);
+    }
+
+    .linha-tamanho {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .linha-tamanho label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #be185d;
+    }
+
+    #valorTamanho {
+      background-color: #ffedd5;
+      color: #c2410c;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #fecdd3;
+      border-radius: 8px;
+      outline: none;
+      accent-color: #f97316;
+      cursor: pointer;
+    }
+
+    .opcoes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .opcoes label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #be185d;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 12px;
+      transition: background 0.2s ease;
+    }
+
+    .opcoes label:hover {
+      background-color: #fff7ed;
+    }
+
+    .opcoes input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #ec4899;
+      cursor: pointer;
+    }
+
+    .medidor-forca {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .forca {
+      height: 8px;
+      border-radius: 8px;
+      background-color: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .forca-barra {
+      height: 100%;
+      width: 0%;
+      border-radius: 8px;
+      background-color: #d4d4d4;
+      transition: width 0.4s ease, background-color 0.4s ease;
+    }
+
+    #textoForca {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #be185d;
+      text-align: right;
+    }
+
+    button#botaoGerar {
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      /* Cor sólida, sem degradê */
+      background-color: #f97316;
+      color: #ffffff;
+      box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    button#botaoGerar:hover {
+      background-color: #ea580c;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(249, 115, 22, 0.4);
+    }
+
+    button#botaoGerar:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 5px 10px rgba(249, 115, 22, 0.3);
+    }
+
+    .aviso {
+      font-size: 0.85rem;
+      color: #c2410c;
+      font-weight: 600;
+      text-align: center;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="titulo">Gerador de Senhas</h1>
+
+  <div class="painel">
+
+    <div class="campo-senha">
+      <span id="senhaGerada" class="senha-vazia">••••••••••••</span>
+      <button id="botaoCopiar" title="Copiar senha">Copiar</button>
+    </div>
+
+    <div class="medidor-forca">
+      <div class="forca">
+        <div class="forca-barra" id="forcaBarra"></div>
+      </div>
+      <span id="textoForca">Força: —</span>
+    </div>
+
+    <div class="linha-tamanho">
+      <label for="tamanho">
+        <span>Tamanho da senha</span>
+        <span id="valorTamanho">12</span>
+      </label>
+      <input type="range" id="tamanho" min="4" max="32" value="12">
+    </div>
+
+    <div class="opcoes">
+      <label>
+        <input type="checkbox" id="opMaiusculas" checked>
+        Letras maiúsculas (A-Z)
+      </label>
+      <label>
+        <input type="checkbox" id="opMinusculas" checked>
+        Letras minúsculas (a-z)
+      </label>
+      <label>
+        <input type="checkbox" id="opNumeros" checked>
+        Números (0-9)
+      </label>
+      <label>
+        <input type="checkbox" id="opEspeciais">
+        Caracteres especiais (!@#$...)
+      </label>
+    </div>
+
+    <p class="aviso" id="aviso"></p>
+
+    <button id="botaoGerar">Criar nova senha</button>
+  </div>
+
+  <script>
+    const CONJUNTOS = {
+      maiusculas: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      minusculas: 'abcdefghijklmnopqrstuvwxyz',
+      numeros: '0123456789',
+      especiais: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+    };
+
+    const inputTamanho = document.getElementById('tamanho');
+    const valorTamanho = document.getElementById('valorTamanho');
+    const opMaiusculas = document.getElementById('opMaiusculas');
+    const opMinusculas = document.getElementById('opMinusculas');
+    const opNumeros = document.getElementById('opNumeros');
+    const opEspeciais = document.getElementById('opEspeciais');
+    const botaoGerar = document.getElementById('botaoGerar');
+    const botaoCopiar = document.getElementById('botaoCopiar');
+    const senhaGeradaEl = document.getElementById('senhaGerada');
+    const avisoEl = document.getElementById('aviso');
+    const forcaBarra = document.getElementById('forcaBarra');
+    const textoForca = document.getElementById('textoForca');
+
+    inputTamanho.addEventListener('input', () => {
+      valorTamanho.textContent = inputTamanho.value;
+    });
+
+    function montarConjuntoDisponivel() {
+      let conjunto = '';
+      if (opMaiusculas.checked) conjunto += CONJUNTOS.maiusculas;
+      if (opMinusculas.checked) conjunto += CONJUNTOS.minusculas;
+      if (opNumeros.checked) conjunto += CONJUNTOS.numeros;
+      if (opEspeciais.checked) conjunto += CONJUNTOS.especiais;
+      return conjunto;
+    }
+
+    function caractereAleatorio(fonte) {
+      const indice = Math.floor(Math.random() * fonte.length);
+      return fonte[indice];
+    }
+
+    function embaralhar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function gerarSenha() {
+      const tamanho = parseInt(inputTamanho.value, 10);
+      const tiposAtivos = [];
+
+      if (opMaiusculas.checked) tiposAtivos.push(CONJUNTOS.maiusculas);
+      if (opMinusculas.checked) tiposAtivos.push(CONJUNTOS.minusculas);
+      if (opNumeros.checked) tiposAtivos.push(CONJUNTOS.numeros);
+      if (opEspeciais.checked) tiposAtivos.push(CONJUNTOS.especiais);
+
+      if (tiposAtivos.length === 0) {
+        avisoEl.textContent = 'Marque pelo menos uma opção.';
+        return null;
+      }
+
+      if (tamanho < tiposAtivos.length) {
+        avisoEl.textContent = `O tamanho precisa ser pelo menos ${tiposAtivos.length} para usar essas opções.`;
+        return null;
+      }
+
+      avisoEl.textContent = '';
+      const conjuntoCompleto = montarConjuntoDisponivel();
+      const caracteresSenha = [];
+
+      tiposAtivos.forEach((tipo) => {
+        caracteresSenha.push(caractereAleatorio(tipo));
+      });
+
+      while (caracteresSenha.length < tamanho) {
+        caracteresSenha.push(caractereAleatorio(conjuntoCompleto));
+      }
+
+      return embaralhar(caracteresSenha).join('');
+    }
+
+    function calcularForca(senha, quantidadeTipos) {
+      if (!senha) return { percentual: 0, texto: '—', cor: '#d4d4d4' };
+
+      let pontuacao = 0;
+      if (senha.length >= 8) pontuacao++;
+      if (senha.length >= 12) pontuacao++;
+      if (senha.length >= 16) pontuacao++;
+      pontuacao += quantidadeTipos - 1;
+
+      const percentual = Math.min((pontuacao / 6) * 100, 100);
+
+      let texto = 'Fraca';
+      let cor = '#fb923c';
+
+      if (percentual >= 40) {
+        texto = 'Média';
+        cor = '#f97316';
+      }
+
+      if (percentual >= 75) {
+        texto = 'Forte';
+        cor = '#db2777';
+      }
+
+      return { percentual, texto, cor };
+    }
+
+    botaoGerar.addEventListener('click', () => {
+      const senha = gerarSenha();
+
+      if (!senha) {
+        senhaGeradaEl.textContent = '••••••••••••';
+        senhaGeradaEl.classList.add('senha-vazia');
+        forcaBarra.style.width = '0%';
+        textoForca.textContent = 'Força: —';
+        return;
+      }
+
+      senhaGeradaEl.classList.remove('senha-vazia');
+      senhaGeradaEl.textContent = senha;
+
+      const quantidadeTipos = [opMaiusculas, opMinusculas, opNumeros, opEspeciais]
+        .filter((checkbox) => checkbox.checked).length;
+
+      const { percentual, texto, cor } = calcularForca(senha, quantidadeTipos);
+      forcaBarra.style.width = percentual + '%';
+      forcaBarra.style.backgroundColor = cor;
+
+      textoForca.style.color = cor;
+      textoForca.textContent = `Força: ${texto}`;
+    });
+
+    botaoCopiar.addEventListener('click', () => {
+      const senha = senhaGeradaEl.textContent;
+      if (senha === '••••••••••••' || !senha) return;
+
+      navigator.clipboard.writeText(senha).then(() => {
+        botaoCopiar.textContent = 'Copiado';
+        senhaGeradaEl.parentElement.style.borderColor = '#f97316';
+
+        setTimeout(() => {
+          botaoCopiar.textContent = 'Copiar';
+          senhaGeradaEl.parentElement.style.borderColor = '#fed7aa';
+        }, 1500);
+      });
+    });
+  </script>
+
+</body>
+</html>
